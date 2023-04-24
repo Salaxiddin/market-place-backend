@@ -3,7 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
-const mobileSchema = require("./schemas/MobileSchema");
+
 const Mobile = require("./models/Mobile");
 // Create Express app
 const app = express();
@@ -16,10 +16,14 @@ dotenv.config();
 //MiddleWares
 app.use(express.json());
 app.use(cors());
-// Routes
+
+// Routes Schema, Models
 const mobileRoute = require("./routes/mobile.route");
 const smartWatchesRoute = require("./routes/smartWatches.route");
 const versionRoute = require("./routes/versions.route");
+const mobileSchema = require("./schemas/MobileSchema");
+const smartWatchesSchema = require("./schemas/SmartWatchesSchema");
+const SmartWatches = require("./models/SmartWatches");
 // Connect to MongoDB database
 mongoose
   .connect(process.env.DB_CONNECT, {
@@ -31,10 +35,11 @@ mongoose
 
 // Define schema
 mobileSchema;
+smartWatchesSchema;
 
 // Define model
 Mobile;
-
+SmartWatches;
 // Route for index
 app.get("/", (req, res) => {
   res.send("Server is running");
