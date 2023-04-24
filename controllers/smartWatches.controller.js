@@ -1,4 +1,4 @@
-const SmartWatchesRoute = require("../models/SmartWatches");
+const SmartWatches = require("../models/SmartWatches");
 
 const getAllSmartWatchesBrands = async (req, res) => {
   /*
@@ -10,7 +10,7 @@ const getAllSmartWatchesBrands = async (req, res) => {
   const limit = parseInt(req.query.limit) || 10;
 
   try {
-    const allBrands = await SmartWatchesRoute.distinct("brand");
+    const allBrands = await SmartWatches.distinct("brand");
     const totalBrands = allBrands.length;
     const totalPages = Math.ceil(totalBrands / limit);
 
@@ -59,11 +59,9 @@ if api call: /api/v1/smartWatches?phone=all&page=1&limit=10 (here, phone=all mea
   if (phone === "all") {
     filter = {};
   }
-  const totalCount = await SmartWatchesRoute.countDocuments(filter);
+  const totalCount = await SmartWatches.countDocuments(filter);
 
-  const smartWatches = await SmartWatchesRoute.find(filter)
-    .skip(skip)
-    .limit(limit);
+  const smartWatches = await SmartWatches.find(filter).skip(skip).limit(limit);
 
   // Calculate total number of pages
   const totalPages = Math.ceil(totalCount / limit);
@@ -87,7 +85,7 @@ if api call: api/v1/smartWatches/details?smartWatchesName=Apple Watch SE (2022) 
     filter["title"] = { $regex: new RegExp(smartWatchesName, "i") };
   }
 
-  const smartWatches = await SmartWatchesRoute.findOne(filter);
+  const smartWatches = await SmartWatches.findOne(filter);
 
   if (smartWatches) {
     res.json({
@@ -121,11 +119,9 @@ const searchSmartWatchesByTitle = async (req, res) => {
     filter["title"] = { $regex: keyword, $options: "i" };
   }
 
-  const totalCount = await SmartWatchesRoute.countDocuments(filter);
+  const totalCount = await SmartWatches.countDocuments(filter);
 
-  const smartWatches = await SmartWatchesRoute.find(filter)
-    .skip(skip)
-    .limit(limit);
+  const smartWatches = await SmartWatches.find(filter).skip(skip).limit(limit);
   // Calculate total number of pages
   const totalPages = Math.ceil(totalCount / limit);
   if (totalCount) {

@@ -1,4 +1,4 @@
-const MobileRoute = require("../models/Mobile");
+const Mobile = require("../models/Mobile");
 
 const getAllMobileBrands = async (req, res) => {
   /*
@@ -10,7 +10,7 @@ const getAllMobileBrands = async (req, res) => {
   const limit = parseInt(req.query.limit) || 10;
 
   try {
-    const allBrands = await MobileRoute.distinct("brand");
+    const allBrands = await Mobile.distinct("brand");
     const totalBrands = allBrands.length;
     const totalPages = Math.ceil(totalBrands / limit);
 
@@ -59,9 +59,9 @@ if api call: /api/v1/mobile?phone=all&page=1&limit=10 (here, phone=all means all
   if (phone === "all") {
     filter = {};
   }
-  const totalCount = await MobileRoute.countDocuments(filter);
+  const totalCount = await Mobile.countDocuments(filter);
 
-  const mobiles = await MobileRoute.find(filter).skip(skip).limit(limit);
+  const mobiles = await Mobile.find(filter).skip(skip).limit(limit);
 
   // Calculate total number of pages
   const totalPages = Math.ceil(totalCount / limit);
@@ -85,7 +85,7 @@ if api call: api/v1/mobile/details?phoneName=Apple iPhone 7 Plus (here, phoneNam
     filter["title"] = { $regex: new RegExp(phoneName, "i") };
   }
 
-  const mobile = await MobileRoute.findOne(filter);
+  const mobile = await Mobile.findOne(filter);
 
   if (mobile) {
     res.json({
@@ -119,9 +119,9 @@ const searchMobilesByTitle = async (req, res) => {
     filter["title"] = { $regex: keyword, $options: "i" };
   }
 
-  const totalCount = await MobileRoute.countDocuments(filter);
+  const totalCount = await Mobile.countDocuments(filter);
 
-  const mobiles = await MobileRoute.find(filter).skip(skip).limit(limit);
+  const mobiles = await Mobile.find(filter).skip(skip).limit(limit);
   // Calculate total number of pages
   const totalPages = Math.ceil(totalCount / limit);
   if (totalCount) {
