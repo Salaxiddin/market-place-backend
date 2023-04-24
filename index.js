@@ -21,8 +21,8 @@ app.use(cors());
 const mobileRoute = require("./routes/mobile.route");
 const smartWatchesRoute = require("./routes/smartWatches.route");
 const versionRoute = require("./routes/versions.route");
-const mobileSchema = require("./schemas/MobileSchema");
-const smartWatchesSchema = require("./schemas/SmartWatchesSchema");
+const mobileSchema = require("./schemas/mobileSchema");
+const smartWatchesSchema = require("./schemas/smartWatchesSchema");
 const SmartWatches = require("./models/SmartWatches");
 // Connect to MongoDB database
 mongoose

@@ -1,5 +1,5 @@
 const { default: mongoose } = require("mongoose");
-const smartWatchesSchema = require("../schemas/SmartWatchesSchema");
+const smartWatchesSchema = require("../schemas/smartWatchesSchema");
 
 const SmartWatches = mongoose.model(
   "SmartWatches",
