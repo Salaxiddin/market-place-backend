@@ -10,7 +10,7 @@ const whiteListedDomain = (req, res, next) => {
   const allowedDomains = [
     "https://transport-route-bd-client.vercel.app",
     "http://transport-route-bd-client.vercel.app",
-    // "http://localhost:3000",
+    "http://localhost:3000",
   ];
 
   // check if the request origin matches one of the allowed domains

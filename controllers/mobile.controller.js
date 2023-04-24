@@ -1,44 +1,4 @@
 const MobileRoute = require("../models/Mobile");
-//   // Get page and limit from query params, default to 1 and 10 respectively
-//   const page = parseInt(req.query.page) || 1;
-//   const limit = parseInt(req.query.limit) || 10;
-
-//   // Calculate skip based on page and limit
-//   const skip = (page - 1) * limit;
-//   // Get from and to parameters from query string
-//   const from = req.query.from;
-//   const to = req.query.to;
-
-//   // Create filter object based on from and to parameters
-//   const filter = {};
-//   if (from && to) {
-//     filter.routes = { $all: [from, to] };
-//   } else if (from) {
-//     filter.routes = from;
-//   } else if (to) {
-//     filter.routes = to;
-//   }
-
-//   // Get total count of bus routes
-//   const totalCount = await DhakaBusRoute.countDocuments(filter);
-
-//   // Get bus routes for current page and limit
-//   const dhakaBusRoutes = await DhakaBusRoute.find(filter)
-//     .skip(skip)
-//     .limit(limit);
-
-//   // Calculate total number of pages
-//   const totalPages = Math.ceil(totalCount / limit);
-
-//   // Send response with bus routes, total count, total pages, and current page
-//   res.json({
-//     status: true,
-//     data: dhakaBusRoutes,
-//     total_count: totalCount,
-//     total_pages: totalPages,
-//     current_page: page,
-//   });
-// };
 
 const getAllMobileBrands = async (req, res) => {
   /*
@@ -143,6 +103,7 @@ const searchMobilesByTitle = async (req, res) => {
   /*
   if api call: /api/v1/mobile/search?phone=apple (here, all apple devices will be shown)
   if api call: /api/v1/mobile/search?phone=apple&page=1&limit=10 (here, all apple devices will be shown but with pagination and, page=current page, limit=how many results will be displayed)
+  if api call: /api/v1/mobile/search?show=all&page=1&limit=10 (here, all mobile devices will be shown but with pagination and, page=current page, limit=how many results will be displayed)
   */
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
@@ -152,7 +113,9 @@ const searchMobilesByTitle = async (req, res) => {
   const keyword = req.query.phone;
 
   const filter = {};
-  if (keyword) {
+  if (req.query.show === "all") {
+    // If the "show" query parameter is "all", don't apply any filters
+  } else if (keyword) {
     filter["title"] = { $regex: keyword, $options: "i" };
   }
 

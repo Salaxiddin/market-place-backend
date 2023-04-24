@@ -18,6 +18,7 @@ app.use(express.json());
 app.use(cors());
 // Routes
 const mobileRoute = require("./routes/mobile.route");
+const smartWatchesRoute = require("./routes/smartWatches.route");
 const versionRoute = require("./routes/versions.route");
 // Connect to MongoDB database
 mongoose
@@ -41,6 +42,7 @@ app.get("/", (req, res) => {
 
 // Define endpoint for getting all bus routes
 app.use("/api/v1/mobile", mobileRoute);
+app.use("/api/v1/smartWatches", smartWatchesRoute);
 app.use("/api/v1/version", versionRoute);
 
 // Start server
