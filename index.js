@@ -3,7 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
-const mobileSchema = require("./schemas/mobileSchema");
+const mobileSchema = require("./schemas/MobileSchema");
 const Mobile = require("./models/Mobile");
 // Create Express app
 const app = express();
@@ -29,10 +29,10 @@ mongoose
   .then(() => console.log("Connected to database"))
   .catch((err) => console.error("Failed to connect to database", err));
 
-// Define bus route schema
+// Define schema
 mobileSchema;
 
-// Define bus route model
+// Define model
 Mobile;
 
 // Route for index
