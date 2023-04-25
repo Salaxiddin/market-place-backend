@@ -3,8 +3,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
-const mobileSchema = require("./schemas/mobileSchema");
-const Mobile = require("./models/Mobile");
+const gadgetSchema = require("./schemas/gadgetSchema");
+const Gadget = require("./models/Gadget");
 // Create Express app
 const app = express();
 
@@ -17,7 +17,7 @@ dotenv.config();
 app.use(express.json());
 app.use(cors());
 // Routes
-const mobileRoute = require("./routes/mobile.route");
+const gadgetRoute = require("./routes/gadget.route");
 const versionRoute = require("./routes/versions.route");
 // Connect to MongoDB database
 mongoose
@@ -28,11 +28,11 @@ mongoose
   .then(() => console.log("Connected to database"))
   .catch((err) => console.error("Failed to connect to database", err));
 
-// Define bus route schema
-mobileSchema;
+// Define route schema
+gadgetSchema;
 
-// Define bus route model
-Mobile;
+// Define route model
+Gadget;
 
 // Route for index
 app.get("/", (req, res) => {
@@ -40,7 +40,7 @@ app.get("/", (req, res) => {
 });
 
 // Define endpoint for getting all bus routes
-app.use("/api/v1/mobile", mobileRoute);
+app.use("/api/v1/gadgets", gadgetRoute);
 app.use("/api/v1/version", versionRoute);
 
 // Start server
