@@ -83,7 +83,7 @@ if api call: api/v1/gadgets/details?gadget=Apple iPhone 7 Plus (here, phoneName 
 
   const filter = {};
   if (gadget) {
-    filter["title"] = { $regex: new RegExp(gadget, "i") };
+    filter["title"] = { $regex: new RegExp(gadget) };
   }
 
   const data = await Gadget.findOne(filter);
@@ -100,6 +100,7 @@ if api call: api/v1/gadgets/details?gadget=Apple iPhone 7 Plus (here, phoneName 
     });
   }
 };
+
 const searchGadgetByTitle = async (req, res) => {
   /*
   if api call: /api/v1/gadgets/search?keyword=apple (here, all apple devices will be shown)
