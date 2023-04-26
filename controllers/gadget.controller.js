@@ -77,18 +77,51 @@ if api call: /api/v1/gadgets?gadget=all&page=1&limit=10 (here, phone=all means a
 //get details
 const getGadgetDetails = async (req, res) => {
   /* 
-if api call: api/v1/gadgets/details?gadget=Apple iPhone 7 Plus (here, phoneName = phone's model name. it will show only one result)
+ /api/v1/gadgets/details?id=bl-bla-bla-ID = it will find from _id
+  
   */
-  const gadget = req.query.gadget;
+  const id = req.query.id.slice(-5);
+  const pipeline = [
+    {
+      $addFields: {
+        idString: { $toString: "$_id" },
+        idStringLength: { $strLenBytes: { $toString: "$_id" } },
+      },
+    },
+    {
+      $addFields: {
+        lastFiveBytes: {
+          $subtract: [
+            "$idStringLength",
+            {
+              $cond: {
+                if: { $gt: ["$idStringLength", 5] },
+                then: 5,
+                else: "$idStringLength",
+              },
+            },
+          ],
+        },
+      },
+    },
+    {
+      $addFields: {
+        lastFive: {
+          $substrBytes: ["$idString", "$lastFiveBytes", 5],
+        },
+      },
+    },
+    {
+      $match: { lastFive: id },
+    },
+    {
+      $project: { idString: 0, lastFive: 0 },
+    },
+  ];
 
-  const filter = {};
-  if (gadget) {
-    filter["title"] = { $regex: new RegExp(gadget) };
-  }
+  const data = await Gadget.aggregate(pipeline);
 
-  const data = await Gadget.findOne(filter);
-
-  if (data) {
+  if (data.length > 0) {
     res.json({
       status: true,
       data: data,
