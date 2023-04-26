@@ -51,14 +51,13 @@ if api call: /api/v1/gadgets?gadget=all&page=1&limit=10 (here, phone=all means a
   const skip = (page - 1) * limit;
 
   const brandName = req.query.brandName;
-  const gadget = req.query.gadget;
+
   let filter = {};
   if (brandName) {
-    filter["brand"] = { $eq: brandName };
+    // Use a case-insensitive regex for the brand field
+    filter["brand"] = { $regex: new RegExp(brandName, "i") };
   }
-  if (gadget === "all") {
-    filter = {};
-  }
+
   const totalCount = await Gadget.countDocuments(filter);
 
   const data = await Gadget.find(filter).skip(skip).limit(limit);
@@ -74,6 +73,7 @@ if api call: /api/v1/gadgets?gadget=all&page=1&limit=10 (here, phone=all means a
     current_page: page,
   });
 };
+
 //get details
 const getGadgetDetails = async (req, res) => {
   /* 
