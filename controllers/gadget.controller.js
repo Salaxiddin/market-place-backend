@@ -195,36 +195,34 @@ const searchGadgetByTitle = async (req, res) => {
 };
 const getFilteredGadgetsByCategory = async (req, res) => {
   /*
-  if api call: /api/gadgets?show=smartPhone&page=1&limit=5 (here, page=current page, limit=how many results will be displayed)
-  show's value: smartPhone, smartWatch, all
+    if api call: /api/gadgets?show=smartPhone&page=1&limit=5 (here, page=current page, limit=how many results will be displayed)
+    show's value: smartPhone, smartWatch, all
   */
   const category = req.query.show;
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
 
   try {
-    let allGadgets;
+    let filter = {};
     if (category === "smartWatch") {
-      allGadgets = await Gadget.find({ category: "Smart Watch" });
+      filter["category"] = "Smart Watch";
     } else if (category === "smartPhone") {
-      allGadgets = await Gadget.find({ category: "Smartphone" });
-    } else if (category === "all") {
-      allGadgets = await Gadget.find({});
-    } else {
-      return res.status(400).json({ error: "Invalid category specified" });
+      filter["category"] = "Smartphone";
     }
 
-    const totalGadgets = allGadgets.length;
-    const totalPages = Math.ceil(totalGadgets / limit);
+    const totalCount = await Gadget.countDocuments(filter);
 
-    const startIndex = (page - 1) * limit;
-    const endIndex = page * limit;
-    const gadgetsToShow = allGadgets.slice(startIndex, endIndex);
+    const data = await Gadget.find(filter)
+      .sort({ _id: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const totalPages = Math.ceil(totalCount / limit);
 
     res.json({
       status: true,
-      gadgets: gadgetsToShow,
-      total_count: totalGadgets,
+      gadgets: data,
+      total_count: totalCount,
       total_pages: totalPages,
       current_page: page,
     });
