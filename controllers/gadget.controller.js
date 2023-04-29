@@ -75,7 +75,7 @@ const getGadgetByBrand = async (req, res) => {
   const totalCount = await Gadget.countDocuments(filter);
 
   const data = await Gadget.find(filter)
-    .sort({ createdAt: -1 })
+    .sort({ _id: -1 })
     .skip(skip)
     .limit(limit);
 
