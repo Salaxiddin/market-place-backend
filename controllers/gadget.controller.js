@@ -67,7 +67,7 @@ if api call: /api/v1/gadgets?gadget=all&page=1&limit=10 (here, phone=all means a
 
   res.json({
     status: true,
-    data: data,
+    gadgets: data,
     total_count: totalCount,
     total_pages: totalPages,
     current_page: page,
