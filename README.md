@@ -1,4 +1,4 @@
-# Specificationsbd Server
+# Gadget Specs Backend
 
 ## Installation
 
@@ -32,4 +32,3 @@ Please make sure to update tests as appropriate.
 ## Author
 
 - [@nesaranaeem](https://www.github.com/nesaranaeem)
-"# specificationsbd" 
