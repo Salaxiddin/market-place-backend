@@ -5,18 +5,31 @@ const getAllGadgetBrands = async (req, res) => {
   if api call: /api/gadgets/brands (here, it will show 10 items)
   if api call: /api/gadgets/brands?page=all (here, it shows all items)
   if api call: /api/gadgets/brands?page=1&limit=5 (here, page=current page, limit=how many results will be displayed)
+  if api call: /api/gadgets/brands?sort=count (here, results will be sorted by count of items per brand)
   */
   const page = req.query.page === "all" ? "all" : parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
+  const sortByCount = req.query.sort === "count";
 
   try {
-    const allBrands = await Gadget.distinct("brand");
+    let allBrands;
+    if (sortByCount) {
+      allBrands = await Gadget.aggregate([
+        { $group: { _id: "$brand", count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $project: { _id: 0, brand: "$_id", count: 1 } },
+      ]);
+    } else {
+      allBrands = await Gadget.distinct("brand");
+      allBrands = allBrands.map((brand) => ({ brandName: brand }));
+    }
+
     const totalBrands = allBrands.length;
     const totalPages = Math.ceil(totalBrands / limit);
 
     let formattedBrands;
     if (page === "all") {
-      formattedBrands = allBrands.map((brand) => ({ brandName: brand }));
+      formattedBrands = allBrands;
       res.json({
         status: true,
         brands: formattedBrands,
@@ -26,7 +39,7 @@ const getAllGadgetBrands = async (req, res) => {
       const startIndex = (page - 1) * limit;
       const endIndex = page * limit;
       const brandsToShow = allBrands.slice(startIndex, endIndex);
-      formattedBrands = brandsToShow.map((brand) => ({ brandName: brand }));
+      formattedBrands = brandsToShow;
 
       res.json({
         status: true,
@@ -40,6 +53,7 @@ const getAllGadgetBrands = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
 const getGadgetByBrand = async (req, res) => {
   /* 
 if api call: /api/v1/gadgets?brandName=apple&page=1&limit=10 (here, brandName=brand name, page=current page, limit=how many results will be displayed)
