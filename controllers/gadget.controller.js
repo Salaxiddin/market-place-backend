@@ -56,8 +56,8 @@ const getAllGadgetBrands = async (req, res) => {
 
 const getGadgetByBrand = async (req, res) => {
   /* 
-if api call: /api/v1/gadgets?brandName=apple&page=1&limit=10 (here, brandName=brand name, page=current page, limit=how many results will be displayed)
-if api call: /api/v1/gadgets?gadget=all&page=1&limit=10 (here, phone=all means all phone will be displayed, page=current page, limit=how many results will be displayed)
+    if api call: /api/v1/gadgets?brandName=apple&page=1&limit=10 (here, brandName=brand name, page=current page, limit=how many results will be displayed)
+    if api call: /api/v1/gadgets?gadget=all&page=1&limit=10 (here, phone=all means all phone will be displayed, page=current page, limit=how many results will be displayed)
   */
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
@@ -74,7 +74,10 @@ if api call: /api/v1/gadgets?gadget=all&page=1&limit=10 (here, phone=all means a
 
   const totalCount = await Gadget.countDocuments(filter);
 
-  const data = await Gadget.find(filter).skip(skip).limit(limit);
+  const data = await Gadget.find(filter)
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
 
   // Calculate total number of pages
   const totalPages = Math.ceil(totalCount / limit);
