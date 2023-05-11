@@ -78,27 +78,6 @@ const getGadgetByBrand = async (req, res) => {
     .sort({ _id: -1 })
     .skip(skip)
     .limit(limit);
-  //   return docs.map((doc) => {
-  //     let launchAnnouncement = doc.specifications[0].LaunchAnnouncement;
-  //     if (!launchAnnouncement) {
-  //       doc.specifications[0].LaunchAnnouncement = null;
-  //       return doc;
-  //     }
-  //     // check if launchAnnouncement is in "yyyy, MMMM" or "yyyy" format
-  //     if (launchAnnouncement.match(/^\d{4}(, \w+)?$/)) {
-  //       launchAnnouncement = launchAnnouncement.replace(", ", " ");
-  //       const date = new Date(launchAnnouncement);
-  //       if (isNaN(date.getTime())) {
-  //         doc.specifications[0].LaunchAnnouncement = null;
-  //       } else {
-  //         doc.specifications[0].LaunchAnnouncement = date;
-  //       }
-  //     } else {
-  //       doc.specifications[0].LaunchAnnouncement = null;
-  //     }
-  //     return doc;
-  //   });
-  // });
 
   // Calculate total number of pages
   const totalPages = Math.ceil(totalCount / limit);
@@ -197,7 +176,7 @@ const searchGadgetByTitle = async (req, res) => {
   const data = await Gadget.find(filter)
     .skip(skip)
     .limit(limit)
-    .sort({ "specifications.LaunchAnnouncement": -1, _id: -1 });
+    .sort({ _id: -1 });
   // Calculate total number of pages
   const totalPages = Math.ceil(totalCount / limit);
   if (totalCount) {
