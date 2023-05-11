@@ -7,6 +7,14 @@ const mobileSchema = new mongoose.Schema({
   imageURL: { type: String, required: true },
   category: { type: String, required: true },
   price: { type: String, required: true },
-  specifications: [],
+  specifications: [
+    {
+      // other fields
+      LaunchAnnouncement: {
+        type: Date,
+      },
+      // other fields
+    },
+  ],
 });
 module.exports = mobileSchema;

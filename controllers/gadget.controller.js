@@ -77,7 +77,30 @@ const getGadgetByBrand = async (req, res) => {
   const data = await Gadget.find(filter)
     .sort({ "specifications.LaunchAnnouncement": -1, _id: -1 })
     .skip(skip)
-    .limit(limit);
+    .limit(limit)
+    .lean()
+    .then((docs) => {
+      return docs.map((doc) => {
+        let launchAnnouncement = doc.specifications[0].LaunchAnnouncement;
+        if (!launchAnnouncement) {
+          doc.specifications[0].LaunchAnnouncement = null;
+          return doc;
+        }
+        // check if launchAnnouncement is in "yyyy, MMMM" or "yyyy" format
+        if (launchAnnouncement.match(/^\d{4}(, \w+)?$/)) {
+          launchAnnouncement = launchAnnouncement.replace(", ", " ");
+          const date = new Date(launchAnnouncement);
+          if (isNaN(date.getTime())) {
+            doc.specifications[0].LaunchAnnouncement = null;
+          } else {
+            doc.specifications[0].LaunchAnnouncement = date;
+          }
+        } else {
+          doc.specifications[0].LaunchAnnouncement = null;
+        }
+        return doc;
+      });
+    });
 
   // Calculate total number of pages
   const totalPages = Math.ceil(totalCount / limit);
@@ -216,9 +239,32 @@ const getFilteredGadgetsByCategory = async (req, res) => {
     const totalCount = await Gadget.countDocuments(filter);
 
     const data = await Gadget.find(filter)
-      .sort({ _id: -1 })
-      .skip((page - 1) * limit)
-      .limit(limit);
+      .sort({ "specifications.LaunchAnnouncement": -1, _id: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean()
+      .then((docs) => {
+        return docs.map((doc) => {
+          let launchAnnouncement = doc.specifications[0].LaunchAnnouncement;
+          if (!launchAnnouncement) {
+            doc.specifications[0].LaunchAnnouncement = null;
+            return doc;
+          }
+          // check if launchAnnouncement is in "yyyy, MMMM" or "yyyy" format
+          if (launchAnnouncement.match(/^\d{4}(, \w+)?$/)) {
+            launchAnnouncement = launchAnnouncement.replace(", ", " ");
+            const date = new Date(launchAnnouncement);
+            if (isNaN(date.getTime())) {
+              doc.specifications[0].LaunchAnnouncement = null;
+            } else {
+              doc.specifications[0].LaunchAnnouncement = date;
+            }
+          } else {
+            doc.specifications[0].LaunchAnnouncement = null;
+          }
+          return doc;
+        });
+      });
 
     const totalPages = Math.ceil(totalCount / limit);
 
