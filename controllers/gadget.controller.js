@@ -75,7 +75,7 @@ const getGadgetByBrand = async (req, res) => {
   const totalCount = await Gadget.countDocuments(filter);
 
   const data = await Gadget.find(filter)
-    .sort({ _id: -1 })
+    .sort({ "specifications.LaunchAnnouncement": -1, _id: -1 })
     .skip(skip)
     .limit(limit);
 
@@ -173,7 +173,10 @@ const searchGadgetByTitle = async (req, res) => {
 
   const totalCount = await Gadget.countDocuments(filter);
 
-  const data = await Gadget.find(filter).skip(skip).limit(limit);
+  const data = await Gadget.find(filter)
+    .skip(skip)
+    .limit(limit)
+    .sort({ "specifications.LaunchAnnouncement": -1, _id: -1 });
   // Calculate total number of pages
   const totalPages = Math.ceil(totalCount / limit);
   if (totalCount) {
@@ -213,7 +216,7 @@ const getFilteredGadgetsByCategory = async (req, res) => {
     const totalCount = await Gadget.countDocuments(filter);
 
     const data = await Gadget.find(filter)
-      .sort({ _id: -1 })
+      .sort({ "specifications.LaunchAnnouncement": -1, _id: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
 
