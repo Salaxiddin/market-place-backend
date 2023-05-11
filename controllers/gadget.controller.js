@@ -216,7 +216,7 @@ const getFilteredGadgetsByCategory = async (req, res) => {
     const totalCount = await Gadget.countDocuments(filter);
 
     const data = await Gadget.find(filter)
-      .sort({ "specifications.LaunchAnnouncement": -1, _id: -1 })
+      .sort({ _id: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
 
