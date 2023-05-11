@@ -240,7 +240,7 @@ const getFilteredGadgetsByCategory = async (req, res) => {
 
     const data = await Gadget.find(filter)
       .sort({ "specifications.LaunchAnnouncement": -1, _id: -1 })
-      .skip(skip)
+
       .limit(limit)
       .lean()
       .then((docs) => {
