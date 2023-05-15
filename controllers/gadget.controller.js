@@ -198,57 +198,33 @@ const searchGadgetByTitle = async (req, res) => {
 };
 const getFilteredGadgetsByCategory = async (req, res) => {
   /*
-    if api call: /api/gadgets?show=smartPhone&page=1&limit=5 (here, page=current page, limit=how many results will be displayed)
-    show's value: smartPhone, smartWatch, all
+  if api call: /api/gadgets?show=smartPhone&page=1&limit=5 (here, page=current page, limit=how many results will be displayed)
+  show's value: smartPhone, smartWatch, all
   */
   const category = req.query.show;
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
 
   try {
-    let filter = {};
+    let query = {};
     if (category === "smartWatch") {
-      filter["category"] = "Smart Watch";
+      query = { category: "Smart Watch" };
     } else if (category === "smartPhone") {
-      filter["category"] = "Smartphone";
+      query = { category: "Smartphone" };
     }
 
-    const totalCount = await Gadget.countDocuments(filter);
+    const allGadgets = await Gadget.find(query)
+      .sort({ LaunchAnnouncement: -1, _id: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
 
-    const data = await Gadget.find(filter)
-      .sort({ "specifications.LaunchAnnouncement": -1, _id: -1 })
-
-      .limit(limit)
-      .lean()
-      .then((docs) => {
-        return docs.map((doc) => {
-          let launchAnnouncement = doc.specifications[0].LaunchAnnouncement;
-          if (!launchAnnouncement) {
-            doc.specifications[0].LaunchAnnouncement = null;
-            return doc;
-          }
-          // check if launchAnnouncement is in "yyyy, MMMM" or "yyyy" format
-          if (launchAnnouncement.match(/^\d{4}(, \w+)?$/)) {
-            launchAnnouncement = launchAnnouncement.replace(", ", " ");
-            const date = new Date(launchAnnouncement);
-            if (isNaN(date.getTime())) {
-              doc.specifications[0].LaunchAnnouncement = null;
-            } else {
-              doc.specifications[0].LaunchAnnouncement = date;
-            }
-          } else {
-            doc.specifications[0].LaunchAnnouncement = null;
-          }
-          return doc;
-        });
-      });
-
-    const totalPages = Math.ceil(totalCount / limit);
+    const totalGadgets = await Gadget.countDocuments(query);
+    const totalPages = Math.ceil(totalGadgets / limit);
 
     res.json({
       status: true,
-      gadgets: data,
-      total_count: totalCount,
+      gadgets: allGadgets,
+      total_count: totalGadgets,
       total_pages: totalPages,
       current_page: page,
     });
