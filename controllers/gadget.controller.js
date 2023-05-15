@@ -213,10 +213,15 @@ const getFilteredGadgetsByCategory = async (req, res) => {
       query = { category: "Smartphone" };
     }
 
-    const allGadgets = await Gadget.find(query)
-      .sort({ LaunchAnnouncement: -1, _id: -1 })
-      .skip((page - 1) * limit)
-      .limit(limit);
+    const allGadgets = await Gadget.aggregate([
+      { $match: query },
+      {
+        $addFields: { maxDate: { $max: "$specifications.LaunchAnnouncement" } },
+      },
+      { $sort: { maxDate: -1, _id: -1 } },
+      { $skip: (page - 1) * limit },
+      { $limit: limit },
+    ]);
 
     const totalGadgets = await Gadget.countDocuments(query);
     const totalPages = Math.ceil(totalGadgets / limit);
