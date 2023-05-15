@@ -218,7 +218,7 @@ const getFilteredGadgetsByCategory = async (req, res) => {
       {
         $addFields: { maxDate: { $max: "$specifications.LaunchAnnouncement" } },
       },
-      { $sort: { _id: -1 } },
+      { $sort: { specifications.LaunchAnnouncement: -1 } },
       { $skip: (page - 1) * limit },
       { $limit: limit },
     ]);
