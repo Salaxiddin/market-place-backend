@@ -176,7 +176,7 @@ const searchGadgetByTitle = async (req, res) => {
   const data = await Gadget.find(filter)
     .skip(skip)
     .limit(limit)
-    .sort(
+    
   // Calculate total number of pages
   const totalPages = Math.ceil(totalCount / limit);
   if (totalCount) {
