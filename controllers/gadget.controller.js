@@ -273,7 +273,7 @@ const getFilteredGadgetsByCategory = async (req, res) => {
           },
         },
       },
-      { $sort: { maxDate: -1, _id: -1 } },
+      { $sort: { maxDate: -1 } },
       { $skip: (page - 1) * limit },
       { $limit: limit },
     ]);
