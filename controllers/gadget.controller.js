@@ -258,10 +258,20 @@ const getFilteredGadgetsByCategory = async (req, res) => {
       query = { category: "Smartphone" };
     }
 
+    const { parseISO, compareDesc } = require("date-fns");
+
     const allGadgets = await Gadget.aggregate([
       { $match: query },
       {
-        $addFields: { maxDate: { $max: "$specifications.LaunchAnnouncement" } },
+        $addFields: {
+          maxDate: {
+            $max: [
+              "$specifications.LaunchAnnouncement",
+              parseISO("$specifications.LaunchAnnouncement"),
+              parseISO("01-$specifications.LaunchAnnouncement"),
+            ],
+          },
+        },
       },
       { $sort: { maxDate: -1, _id: -1 } },
       { $skip: (page - 1) * limit },
