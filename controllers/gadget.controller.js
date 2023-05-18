@@ -180,7 +180,24 @@ const searchGadgetByTitle = async (req, res) => {
 
   const filter = {};
   if (req.query.show === "all") {
-    // If the "show" query parameter is "all", don't apply any filters
+    const { parseISO, compareDesc } = require("date-fns");
+
+    const data = await Gadget.find(filter).lean().exec();
+
+    data.sort((a, b) => {
+      const dateComparison = compareDesc(
+        parseISO(a.LaunchAnnouncement),
+        parseISO(b.LaunchAnnouncement)
+      );
+      if (dateComparison !== 0) {
+        return dateComparison;
+      }
+      const categoryComparison = b.category - a.category;
+      if (categoryComparison !== 0) {
+        return categoryComparison;
+      }
+      return b._id - a._id;
+    });
   } else if (keyword) {
     filter["title"] = { $regex: keyword, $options: "i" };
   }
