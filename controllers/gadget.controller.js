@@ -190,7 +190,7 @@ const searchGadgetByTitle = async (req, res) => {
   const data = await Gadget.find(filter)
     .skip(skip)
     .limit(limit)
-    .sort({ _id: -1 });
+    
   // Calculate total number of pages
   const totalPages = Math.ceil(totalCount / limit);
   if (totalCount) {
@@ -232,7 +232,7 @@ const getFilteredGadgetsByCategory = async (req, res) => {
       {
         $addFields: { maxDate: { $max: "$specifications.LaunchAnnouncement" } },
       },
-      { $sort: { maxDate: -1, _id: -1 } },
+      { $sort: { _id: -1 } },
       { $skip: (page - 1) * limit },
       { $limit: limit },
     ]);
