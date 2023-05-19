@@ -100,7 +100,7 @@ const getGadgetByBrand = async (req, res) => {
 
   let data = [];
   if (minPrice !== null && maxPrice !== null) {
-    data = await Gadget.find(filter).lean().exec();
+    data = await Gadget.find(filter).skip(skip).limit(limit).lean().exec();
 
     // Convert the price property from string to number
     data.forEach((gadget) => {
@@ -112,7 +112,7 @@ const getGadgetByBrand = async (req, res) => {
       (gadget) => gadget.price >= minPrice && gadget.price <= maxPrice
     );
   } else {
-    data = await Gadget.find(filter).lean().exec();
+    data = await Gadget.find(filter).skip(skip).limit(limit).lean().exec();
   }
 
   // Sort gadgets by launch announcement date, category, and ID
