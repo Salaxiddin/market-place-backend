@@ -65,17 +65,11 @@ const getAllGadgetBrands = async (req, res) => {
 // Get gadgets by brand
 const getGadgetByBrand = async (req, res) => {
   /* 
-    API Call Examples:
-    - /api/v1/gadgets?brandName=apple&page=1&limit=10&minPrice=default&maxPrice=default (brandName=brand name, page=current page, limit=how many results will be displayed, minPrice=default, maxPrice=default)
-    - /api/v1/gadgets?gadget=all&page=1&limit=10&minPrice=default&maxPrice=default (phone=all means all phones will be displayed, page=current page, limit=how many results will be displayed, minPrice=default, maxPrice=default)
+    if api call: /api/v1/gadgets?brandName=apple&page=1&limit=10 (here, brandName=brand name, page=current page, limit=how many results will be displayed)
+    if api call: /api/v1/gadgets?gadget=all&page=1&limit=10 (here, phone=all means all phone will be displayed, page=current page, limit=how many results will be displayed)
   */
-
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
-  const minPrice =
-    req.query.minPrice !== "default" ? parseInt(req.query.minPrice) : null;
-  const maxPrice =
-    req.query.maxPrice !== "default" ? parseInt(req.query.maxPrice) : null;
 
   const skip = (page - 1) * limit;
 
@@ -87,35 +81,12 @@ const getGadgetByBrand = async (req, res) => {
     filter["brand"] = { $regex: new RegExp(brandName, "i") };
   }
 
-  if (minPrice !== null && maxPrice !== null) {
-    filter["price"] = {
-      $gte: minPrice,
-      $lte: maxPrice,
-    };
-  }
-
   const totalCount = await Gadget.countDocuments(filter);
 
   const { parseISO, compareDesc } = require("date-fns");
 
-  let data = [];
-  if (minPrice !== null && maxPrice !== null) {
-    data = await Gadget.find(filter).skip(skip).limit(limit).lean().exec();
+  const data = await Gadget.find(filter).lean().exec();
 
-    // Convert the price property from string to number
-    data.forEach((gadget) => {
-      gadget.price = parseFloat(gadget.price.replace(/,/g, ""));
-    });
-
-    // Filter gadgets based on price range
-    data = data.filter(
-      (gadget) => gadget.price >= minPrice && gadget.price <= maxPrice
-    );
-  } else {
-    data = await Gadget.find(filter).skip(skip).limit(limit).lean().exec();
-  }
-
-  // Sort gadgets by launch announcement date, category, and ID
   data.sort((a, b) => {
     const dateComparison = compareDesc(
       parseISO(a.LaunchAnnouncement),
@@ -134,22 +105,13 @@ const getGadgetByBrand = async (req, res) => {
   // Calculate total number of pages
   const totalPages = Math.ceil(totalCount / limit);
 
-  let response = {
+  res.json({
     status: true,
     gadgets: data,
     total_count: totalCount,
     total_pages: totalPages,
     current_page: page,
-  };
-
-  if (minPrice !== null && maxPrice !== null && data.length === 0) {
-    response = {
-      status: false,
-      message: "No Gadgets found within the specified price range.",
-    };
-  }
-
-  res.json(response);
+  });
 };
 
 // Get gadget details
