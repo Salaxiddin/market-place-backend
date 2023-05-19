@@ -1,12 +1,15 @@
 const Gadget = require("../models/Gadget");
 
+// Get all gadget brands
 const getAllGadgetBrands = async (req, res) => {
   /*
-  if api call: /api/gadgets/brands (here, it will show 10 items)
-  if api call: /api/gadgets/brands?page=all (here, it shows all items)
-  if api call: /api/gadgets/brands?page=1&limit=5 (here, page=current page, limit=how many results will be displayed)
-  if api call: /api/gadgets/brands?sort=count (here, results will be sorted by count of items per brand)
+    API Call Examples:
+    - /api/gadgets/brands (shows 10 items)
+    - /api/gadgets/brands?page=all (shows all items)
+    - /api/gadgets/brands?page=1&limit=5 (page=current page, limit=how many results will be displayed)
+    - /api/gadgets/brands?sort=count (results sorted by count of items per brand)
   */
+
   const page = req.query.page === "all" ? "all" : parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
   const sortByCount = req.query.sort === "count";
@@ -14,15 +17,17 @@ const getAllGadgetBrands = async (req, res) => {
   try {
     let allBrands;
     if (sortByCount) {
+      // Sort by count in descending order
       allBrands = await Gadget.aggregate([
         { $group: { _id: "$brand", count: { $sum: 1 } } },
         { $sort: { count: -1 } },
         { $project: { _id: 0, brand: "$_id", count: 1 } },
       ]);
     } else {
+      // Sort alphabetically by brand name
       allBrands = await Gadget.aggregate([
         { $group: { _id: "$brand", count: { $sum: 1 } } },
-        { $sort: { _id: 1 } }, // Sort by the "_id" field in ascending order
+        { $sort: { _id: 1 } },
         { $project: { _id: 0, brandName: "$_id", count: 1 } },
       ]);
     }
@@ -57,6 +62,7 @@ const getAllGadgetBrands = async (req, res) => {
   }
 };
 
+// Get gadgets by brand
 const getGadgetByBrand = async (req, res) => {
   /* 
     if api call: /api/v1/gadgets?brandName=apple&page=1&limit=10 (here, brandName=brand name, page=current page, limit=how many results will be displayed)
@@ -108,12 +114,13 @@ const getGadgetByBrand = async (req, res) => {
   });
 };
 
-//get details
+// Get gadget details
 const getGadgetDetails = async (req, res) => {
   /* 
- /api/v1/gadgets/details?id=bl-bla-bla-ID = it will find from _id
-  
+    API Call Example:
+    /api/v1/gadgets/details?id=bl-bla-bla-ID (finds the gadget from _id)
   */
+
   const id = req.query.id.slice(-5);
   const pipeline = [
     {
@@ -163,17 +170,20 @@ const getGadgetDetails = async (req, res) => {
   } else {
     res.json({
       status: false,
-      message: "data not found",
+      message: "Data not found",
     });
   }
 };
 
+// Search gadgets by title
 const searchGadgetByTitle = async (req, res) => {
-  /*
-  if api call: /api/v1/gadgets/search?keyword=apple (here, all apple devices will be shown)
-  if api call: /api/v1/gadgets/search?keyword=apple&page=1&limit=10 (here, all apple devices will be shown but with pagination and, page=current page, limit=how many results will be displayed)
-  if api call: /api/v1/gadgets/search?show=all&page=1&limit=10 (here, all Gadget devices will be shown but with pagination and, page=current page, limit=how many results will be displayed)
+  /* 
+    API Call Examples:
+    - /api/v1/gadgets/search?keyword=apple (shows all apple devices)
+    - /api/v1/gadgets/search?keyword=apple&page=1&limit=10 (shows all apple devices with pagination: page=current page, limit=how many results will be displayed)
+    - /api/v1/gadgets/search?show=all&page=1&limit=10 (shows all Gadget devices with pagination: page=current page, limit=how many results will be displayed)
   */
+
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
 
@@ -194,8 +204,10 @@ const searchGadgetByTitle = async (req, res) => {
     .skip(skip)
     .limit(limit)
     .sort({ _id: -1 });
+
   // Calculate total number of pages
   const totalPages = Math.ceil(totalCount / limit);
+
   if (totalCount) {
     res.json({
       status: true,
@@ -205,19 +217,22 @@ const searchGadgetByTitle = async (req, res) => {
       current_page: page,
     });
   } else {
-    {
-      res.json({
-        status: false,
-        message: "No results found",
-      });
-    }
+    res.json({
+      status: false,
+      message: "No results found",
+    });
   }
 };
+
+// Get filtered gadgets by category
 const getFilteredGadgetsByCategory = async (req, res) => {
-  /*
-  if api call: /api/gadgets?show=smartPhone&page=1&limit=5 (here, page=current page, limit=how many results will be displayed)
-  show's value: smartPhone, smartWatch, all
+  /* 
+    API Call Example:
+    /api/gadgets?show=smartPhone&page=1&limit=5 (page=current page, limit=how many results will be displayed)
+  
+    Possible values for "show": smartPhone, smartWatch, all
   */
+
   const category = req.query.show;
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
