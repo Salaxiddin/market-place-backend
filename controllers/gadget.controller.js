@@ -20,8 +20,11 @@ const getAllGadgetBrands = async (req, res) => {
         { $project: { _id: 0, brand: "$_id", count: 1 } },
       ]);
     } else {
-      allBrands = await Gadget.distinct("brand");
-      allBrands = allBrands.map((brand) => ({ brandName: brand }));
+      allBrands = await Gadget.aggregate([
+        { $group: { _id: "$brand", count: { $sum: 1 } } },
+        { $sort: { _id: 1 } }, // Sort by the "_id" field in ascending order
+        { $project: { _id: 0, brandName: "$_id", count: 1 } },
+      ]);
     }
 
     const totalBrands = allBrands.length;
@@ -180,48 +183,17 @@ const searchGadgetByTitle = async (req, res) => {
 
   const filter = {};
   if (req.query.show === "all") {
-    const { parseISO, compareDesc } = require("date-fns");
-
-    const data = await Gadget.find(filter).lean().exec();
-
-    data.sort((a, b) => {
-      const dateComparison = compareDesc(
-        parseISO(a.LaunchAnnouncement),
-        parseISO(b.LaunchAnnouncement)
-      );
-      if (dateComparison !== 0) {
-        return dateComparison;
-      }
-      const categoryComparison = b.category - a.category;
-      if (categoryComparison !== 0) {
-        return categoryComparison;
-      }
-      return b._id - a._id;
-    });
+    // If the "show" query parameter is "all", don't apply any filters
   } else if (keyword) {
     filter["title"] = { $regex: keyword, $options: "i" };
   }
 
   const totalCount = await Gadget.countDocuments(filter);
 
-  const { parseISO, compareDesc } = require("date-fns");
-
-  const data = await Gadget.find(filter).lean().exec();
-
-  data.sort((a, b) => {
-    const dateComparison = compareDesc(
-      parseISO(a.LaunchAnnouncement),
-      parseISO(b.LaunchAnnouncement)
-    );
-    if (dateComparison !== 0) {
-      return dateComparison;
-    }
-    const categoryComparison = b.category - a.category;
-    if (categoryComparison !== 0) {
-      return categoryComparison;
-    }
-    return b._id - a._id;
-  });
+  const data = await Gadget.find(filter)
+    .skip(skip)
+    .limit(limit)
+    .sort({ _id: -1 });
   // Calculate total number of pages
   const totalPages = Math.ceil(totalCount / limit);
   if (totalCount) {
