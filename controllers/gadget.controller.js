@@ -262,6 +262,14 @@ const getFilteredGadgetsByCategory = async (req, res) => {
       },
       { $sort: { maxDate: -1 } },
       { $skip: (page - 1) * limit },
+      { $limit: limit + (page - 1) * limit },
+      {
+        $group: {
+          _id: "$_id",
+          gadget: { $first: "$$ROOT" },
+        },
+      },
+      { $replaceRoot: { newRoot: "$gadget" } },
       { $limit: limit },
     ]);
 
