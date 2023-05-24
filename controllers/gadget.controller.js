@@ -83,24 +83,12 @@ const getGadgetByBrand = async (req, res) => {
 
   const totalCount = await Gadget.countDocuments(filter);
 
-  const { parseISO, compareDesc } = require("date-fns");
-
-  const data = await Gadget.find(filter).lean().exec();
-
-  data.sort((a, b) => {
-    const dateComparison = compareDesc(
-      parseISO(a.LaunchAnnouncement),
-      parseISO(b.LaunchAnnouncement)
-    );
-    if (dateComparison !== 0) {
-      return dateComparison;
-    }
-    const categoryComparison = b.category - a.category;
-    if (categoryComparison !== 0) {
-      return categoryComparison;
-    }
-    return b._id - a._id;
-  });
+  const data = await Gadget.find(filter)
+    .sort({ _id: -1 })
+    .skip(skip)
+    .limit(limit)
+    .lean()
+    .exec();
 
   // Calculate total number of pages
   const totalPages = Math.ceil(totalCount / limit);
