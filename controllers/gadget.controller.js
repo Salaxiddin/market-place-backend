@@ -173,7 +173,7 @@ const searchGadgetByTitle = async (req, res) => {
   */
 
   const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
+  const limit = req.query.limit === "all" ? 0 : parseInt(req.query.limit) || 10;
 
   const skip = (page - 1) * limit;
 
@@ -183,18 +183,23 @@ const searchGadgetByTitle = async (req, res) => {
   if (req.query.show === "all") {
     // If the "show" query parameter is "all", don't apply any filters
   } else if (keyword) {
-    filter["title"] = { $regex: keyword, $options: "i" };
+    filter["$or"] = [
+      { title: { $regex: keyword, $options: "i" } },
+      { brand: { $regex: keyword, $options: "i" } },
+    ];
+  }
+
+  let query = Gadget.find(filter);
+
+  if (limit !== 0) {
+    query = query.skip(skip).limit(limit);
   }
 
   const totalCount = await Gadget.countDocuments(filter);
-
-  const data = await Gadget.find(filter)
-    .skip(skip)
-    .limit(limit)
-    .sort({ _id: -1 });
+  const data = await query;
 
   // Calculate total number of pages
-  const totalPages = Math.ceil(totalCount / limit);
+  const totalPages = limit === 0 ? 1 : Math.ceil(totalCount / limit);
 
   if (totalCount) {
     res.json({
